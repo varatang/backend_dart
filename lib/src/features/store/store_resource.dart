@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import 'package:backend/src/core/services/database/remote_database.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_modular/shelf_modular.dart';
@@ -29,19 +29,33 @@ class StoreResource extends Resource {
       'INSERT INTO "Store" (id, "createdAt", "updatedAt", "storeId", "storeTitle") VALUES ( @id, @updatedAt, @createdAt, @storeId, @storeTitle ) RETURNING id, "storeId", "storeTitle";',
       variables: storeParams,
     );
-    final userMap = result.map((element) => element['Store']).first;
-    return Response.ok(jsonEncode(userMap));
+    final storeMap = result.map((element) => element['Store']).first;
+    return Response.ok(jsonEncode(storeMap));
   }
 
   FutureOr<Response> _getAllStore(Injector injector) async {
     final database = injector.get<RemoteDatabase>();
 
-    final result = await database
-        .query('SELECT id, "storeId", "storeTitle" FROM "Store";');
+    final result = await database.query(
+        'SELECT id, "updatedAt", "createdAt", "storeId", "storeTitle" FROM "Store";');
 
-    final listUsers = result.map((e) => e['Store']).toList();
+    // Quando tem campo data tem que converter para String senão dá pau
+    final listStore = result.map((e) {
+      String updateAt =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(e['Store']!['updatedAt']);
+      String createdAt =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(e['Store']!['createdAt']);
 
-    return Response.ok(jsonEncode(listUsers));
+      return {
+        'id': e['Store']!['id'],
+        'updatedAt': updateAt, // DateTime convertido para String
+        'createdAt': createdAt, // DateTime convertido para String
+        'storeId': e['Store']!['storeId'],
+        'storeTitle': e['Store']!['storeTitle'],
+      };
+    }).toList();
+
+    return Response.ok(jsonEncode(listStore));
   }
 
   FutureOr<Response> _getStoreByid(
@@ -51,8 +65,8 @@ class StoreResource extends Resource {
     final result = await database.query(
         'SELECT id, "storeId", "storeTitle" FROM "Store" WHERE id = @id;',
         variables: {'id': id});
-    final userMap = result.map((element) => element['Store']).first;
-    return Response.ok(jsonEncode(userMap));
+    final storeMap = result.map((element) => element['Store']).first;
+    return Response.ok(jsonEncode(storeMap));
   }
 
   FutureOr<Response> _deleteStore(
@@ -71,26 +85,38 @@ class StoreResource extends Resource {
 
   FutureOr<Response> _updateStore(
       ModularArguments arguments, Injector injector) async {
-    final userParams = (arguments.data as Map).cast<String, dynamic>();
+    final storeParams = (arguments.data as Map).cast<String, dynamic>();
 
-    final columns = userParams.keys
-        .where((key) => key != 'id' || key != 'createdAt')
+/*  Esse é o jeito mais elegante, mas com for{} funciona tb 
+    final columns = storeParams.keys
+        .where((key) => key != 'id' && key != 'createdAt')
         .map(
           (key) => '$key=@$key',
         )
         .toList();
+*/
+    List<String> columns = [];
+
+    for (String key in storeParams.keys) {
+      if (key != 'id' && key != 'createdAt') {
+        columns.add('"$key"=@$key');
+      }
+    }
 
     try {
       final query =
-          'UPDATE "Store" SET ${columns.join(',')} WHERE id=@id RETURNING id, "storeTitle";';
+          'UPDATE "Store" SET ${columns.join(',')} WHERE id=@id RETURNING id, "storeId", "storeTitle" ;';
 
       final database = injector.get<RemoteDatabase>();
+
       final result = await database.query(
         query,
-        variables: userParams,
+        variables: storeParams,
       );
-      final userMap = result.map((element) => element['Store']).first;
-      return Response.ok(jsonEncode(userMap));
+
+      final storeMap = result.map((element) => element['Store']).first;
+
+      return Response.ok(jsonEncode(storeMap));
     } catch (err) {
       return Response.notFound(jsonEncode({'erro': err.toString()}));
     }

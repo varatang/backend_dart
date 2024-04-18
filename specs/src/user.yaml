@@ -10,9 +10,9 @@ components:
         fullname:
           type: string
         updatedAt:
-          type: datetime
+          type: string
         createdAt:
-          type: datetime
+          type: string
         email:
           type: string
         cpf:

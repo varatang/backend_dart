@@ -1,3 +1,4 @@
+import 'features/device/device_resource.dart';
 import 'features/store/store_resource.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_modular/shelf_modular.dart';
@@ -19,6 +20,7 @@ class AppModule extends Module {
         Route.get('/documentation/**', swaggerHandler),
         Route.resource(UserResource()),
         Route.resource(StoreResource()),
+        Route.resource(DeviceResource()),
         Route.module('/auth', module: AuthModule()),
       ];
 }

@@ -45,7 +45,7 @@ class AuthRepository {
   }
 
   Tokenization _generateToken(Map payload) {
-    payload['exp'] = _determineExpiration(Duration(minutes: 10));
+    payload['exp'] = _determineExpiration(Duration(minutes: 30));
 
     final accessToken = jwt.generateToken(payload, 'accessToken');
 
@@ -56,11 +56,13 @@ class AuthRepository {
 
   int _determineExpiration(Duration duration) {
     final expiresDate = DateTime.now().add(duration);
-    final expiresIn = Duration(milliseconds: expiresDate.millisecondsSinceEpoch);
+    final expiresIn =
+        Duration(milliseconds: expiresDate.millisecondsSinceEpoch);
     return expiresIn.inSeconds;
   }
 
-  Future<void> updatePassword(String token, String password, String newPassword) async {
+  Future<void> updatePassword(
+      String token, String password, String newPassword) async {
     final payload = jwt.getPayload(token);
     final hash = await datasource.getPasswordById(payload['id']);
 

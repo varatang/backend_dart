@@ -74,9 +74,9 @@ class UserResource extends Resource {
     final userParams = (arguments.data as Map).cast<String, dynamic>();
 
     final columns = userParams.keys
-        .where((key) => key != 'id' || key != 'password' || key != 'createdAt')
+        .where((key) => key != "id" && key != "password" && key != "createdAt")
         .map(
-          (key) => '$key=@$key',
+          (key) => '"$key"=@$key',
         )
         .toList();
 
