@@ -1,16 +1,12 @@
-generator client {
-  provider = "dart run orm"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
   username  String
   fullname  String?
   email     String   @unique
@@ -19,26 +15,26 @@ model User {
   role      UserRole @default(user)
   devices   Device[]
   store     Store    @relation(fields: [storeId], references: [id])
-  storeId   String
+  storeId   Int
 }
 
 model Device {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
   deviceId    String
   platform    String?
   fcmToken    String?
   locale      String?
   buildNumber Int?
   user        User     @relation(fields: [userId], references: [id])
-  userId      String
+  userId      Int
 }
 
 model Store {
-  id         String     @id @default(uuid())
+  id         Int        @id @default(autoincrement())
   createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  updatedAt  DateTime   @default(now())
   storeId    String
   storeTitle String
   users      User[]
@@ -46,38 +42,38 @@ model Store {
 }
 
 model Category {
-  id        String    @id @default(uuid())
+  id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime  @default(now())
   name      String
   priority  Int
   visible   Boolean   @default(true)
   image     String
   store     Store     @relation(fields: [storeId], references: [id])
-  storeId   String
+  storeId   Int
   products  Product[]
 }
 
 model Product {
-  id              String    @id @default(uuid())
+  id              Int       @id @default(autoincrement())
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  updatedAt       DateTime  @default(now())
   name            String
   description     String
   priority        Int
   visible         Boolean   @default(true)
   image           String
   category        Category  @relation(fields: [categoryId], references: [id])
-  categoryId      String
+  categoryId      Int
   subProducts     Product[] @relation("subProducts")
   productParent   Product?  @relation("subProducts", fields: [productParentId], references: [id])
-  productParentId String
+  productParentId Int
 }
 
 model Group {
-  id          String       @id @default(uuid())
+  id          Int          @id @default(autoincrement())
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime     @default(now())
   title       String
   description String?
   priority    Int
@@ -88,14 +84,14 @@ model Group {
 }
 
 model Complement {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
   title       String
   description String?
   priority    Int
   group       Group    @relation(fields: [grupoId], references: [id])
-  grupoId     String
+  grupoId     Int
   price       Float
   qtyMax      Int
 }

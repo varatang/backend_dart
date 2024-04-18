@@ -26,7 +26,7 @@ class StoreResource extends Resource {
     final storeParams = (arguments.data as Map).cast<String, dynamic>();
     final database = injector.get<RemoteDatabase>();
     final result = await database.query(
-      'INSERT INTO "Store" (id, "createdAt", "updatedAt", "storeId", "storeTitle") VALUES ( @id, @updatedAt, @createdAt, @storeId, @storeTitle ) RETURNING id, "storeId", "storeTitle";',
+      'INSERT INTO "Store" ("storeId", "storeTitle") VALUES (  @storeId, @storeTitle ) RETURNING id, "storeId", "storeTitle";',
       variables: storeParams,
     );
     final storeMap = result.map((element) => element['Store']).first;

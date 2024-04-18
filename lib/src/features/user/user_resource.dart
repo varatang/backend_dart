@@ -62,7 +62,7 @@ class UserResource extends Resource {
 
     final database = injector.get<RemoteDatabase>();
     final result = await database.query(
-      'INSERT INTO "User" (id, "updatedAt", "createdAt", "username", "fullname", "cpf", "email", "password", "storeId") VALUES ( @id, @updatedAt, @createdAt, @username, @fullname, @cpf, @email, @password, @storeId ) RETURNING id, "email", "username", "fullname", "cpf", "storeId";',
+      'INSERT INTO "User" ( "username", "fullname", "cpf", "email", "password", "storeId") VALUES ( @username, @fullname, @cpf, @email, @password, @storeId ) RETURNING id, "email", "username", "fullname", "cpf", "storeId";',
       variables: userParams,
     );
     final userMap = result.map((element) => element['User']).first;

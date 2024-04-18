@@ -4,7 +4,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
         username:
           type: string
         fullname:
@@ -17,6 +17,8 @@ components:
           type: string
         cpf:
           type: string
+        storeId:
+          type: integer
         role:
           type: string
           default: user
